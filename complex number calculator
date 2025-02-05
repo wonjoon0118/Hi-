@@ -1,0 +1,87 @@
+import React, { useState } from 'react';
+import { ScatterChart, Scatter, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+
+const ComplexMultiplicationVisualizer = () => {
+  const [complex1, setComplex1] = useState({ real: 1, imag: 1 });
+  const [complex2, setComplex2] = useState({ real: 2, imag: 1 });
+
+  const multiplyComplexNumbers = () => {
+    // 복소수를 극좌표로 변환
+    const toPolar = ({ real, imag }) => {
+      const size = Math.sqrt(real * real + imag * imag);
+      const angle = Math.atan2(imag, real);
+      return { size, angle };
+    };
+
+    const polar1 = toPolar(complex1);
+    const polar2 = toPolar(complex2);
+
+    // 곱셈: 크기끼리 곱하고 각도는 더하기
+    const resultPolar = {
+      size: polar1.size * polar2.size,
+      angle: polar1.angle + polar2.angle,
+    };
+
+    // 결과를 다시 직교좌표로 변환
+    return {
+      real: resultPolar.size * Math.cos(resultPolar.angle),
+      imag: resultPolar.size * Math.sin(resultPolar.angle),
+    };
+  };
+
+  const result = multiplyComplexNumbers();
+  const data = [
+    { x: complex1.real, y: complex1.imag, label: 'z1' },
+    { x: complex2.real, y: complex2.imag, label: 'z2' },
+    { x: result.real, y: result.imag, label: 'z1 * z2' },
+  ];
+
+  return (
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">복소수 곱셈 시각화</h2>
+      <div className="mb-4">
+        <label>복소수 1 입력:</label>
+        <input
+          type="number"
+          value={complex1.real}
+          onChange={(e) => setComplex1({ ...complex1, real: +e.target.value })}
+          className="border p-2 mx-2"
+          placeholder="실수부"
+        />
+        <input
+          type="number"
+          value={complex1.imag}
+          onChange={(e) => setComplex1({ ...complex1, imag: +e.target.value })}
+          className="border p-2 mx-2"
+          placeholder="허수부"
+        />
+      </div>
+      <div className="mb-4">
+        <label>복소수 2 입력:</label>
+        <input
+          type="number"
+          value={complex2.real}
+          onChange={(e) => setComplex2({ ...complex2, real: +e.target.value })}
+          className="border p-2 mx-2"
+          placeholder="실수부"
+        />
+        <input
+          type="number"
+          value={complex2.imag}
+          onChange={(e) => setComplex2({ ...complex2, imag: +e.target.value })}
+          className="border p-2 mx-2"
+          placeholder="허수부"
+        />
+      </div>
+      <ScatterChart width={400} height={400} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+        <CartesianGrid />
+        <XAxis type="number" dataKey="x" name="실수축" />
+        <YAxis type="number" dataKey="y" name="허수축" />
+        <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+        <Scatter name="복소수 점들" data={data} fill="#8884d8" />
+      </ScatterChart>
+    </div>
+  );
+};
+
+export default ComplexMultiplicationVisualizer;
